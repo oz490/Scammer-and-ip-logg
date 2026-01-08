@@ -1,4 +1,10 @@
+getgenv().Executor = identifyexecutor() or getexecutorname() or "nil"
+getgenv().Version = "Version: 0.6"
+getgenv().Build = LPH_OBFUSCATED and "Rewrite" or "Developer"
 
+if getgenv().Executor and (getgenv().Executor:lower():find("xeno") or getgenv().Executor:lower():find("solara")) then
+    game:GetService("Players").LocalPlayer:Kick("Your Executor '" .. getgenv().Executor .. "' is not supported")
+end
 
 
 local QuickHacks = loadstring(game:HttpGet("https://pastefy.app/5WbUoXgd/raw"))()
