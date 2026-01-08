@@ -1,0 +1,2353 @@
+
+
+
+local QuickHacks = loadstring(game:HttpGet("https://pastefy.app/5WbUoXgd/raw"))()
+local window = QuickHacks:CreateWindow({ 
+    Name = "Crashout QuickHacks | Free 🇵🇸 | " .. getgenv().Executor .. " | " .. getgenv().Version, 
+    Icon = "zap", 
+    ToggleKey = Enum.KeyCode.RightControl, 
+    Discord = { 
+        Enabled = false, 
+        Invite = "noinvitelink", 
+    },
+})
+
+--[[Tabs]]
+
+local Tabs = { 
+    Main = window:CreateTab({
+        Name = "Main",
+        Icon = "globe",
+    }),
+    Esp = window:CreateTab({
+        Name = "Esp",
+        Icon = "scan-eye",
+    }),
+    Aimbot = window:CreateTab({
+        Name = "Combat",
+        Icon = "sword",
+    }),
+    AutoFarm = window:CreateTab({
+        Name = "AutoFarm",
+        Icon = "bot", 
+    }),
+    Misc = window:CreateTab({
+        Name = "Misc",
+        Icon = "ellipsis",
+    }),
+
+}
+
+ 
+ 
+
+
+
+
+--[[Config]]
+
+  local Config = {
+    Main = {
+        RespawnTime = nil,
+        ShowScreenButton = false,
+        Method = "Nearest Car",
+        CarMod = {
+            Target = "My Car",
+            Acceleration = 50,
+            Braking = 50,
+            Deceleration = 50,
+            ForwardMaxSpeed = 100,
+            ReverseMaxSpeed = 50,
+        },
+        Aura = {
+        Enabled = false,
+        Mode = "Melee Aura",
+        TargetPart = "Head",
+        Range = 10,
+        lastattack = 0
+            },
+        AutoSafe = {
+            Enabled = false,
+            HealthThreshold = 20,
+            ToolMode = "All Tools",
+        },
+        Teleport = {
+            SelectedTP = "GunShop",
+        },
+        PlayerTeleport = {
+            PlayerUserTarget = "",
+        },
+    },
+
+    Aimbot = {
+        Enabled = false,
+        AimMode = "Slient Aim",
+        Wallbang = false,
+        currenttarget = nil,
+        Friend = false,
+        WallCheck = false,
+        Method = "Fov",
+        MaxDistance = 500,
+        Prediction = 0.05,
+        TargetPart = "Head",
+        Key = "Q",
+    },
+
+    FovAimbot = {
+        Enabled = false,
+        Size = 80,
+        Color = Color3.fromRGB(255, 255, 255),
+    },
+
+    Esp = {
+        Players = {
+            Enabled = false,
+            Names = { Enabled = false, Color = Color3.new(1, 1, 1) },
+            ['Box Chams'] = { Enabled = false, Color = Color3.new(1, 1, 1), Color2 = Color3.new(1, 1, 1) },
+            ['Visualize Chams'] = { Enabled = false, Color = Color3.new(1, 1, 1), Color2 = Color3.new(1, 1, 1) },
+            Weapon = { Enabled = false, Color = Color3.new(1, 1, 1) },
+            Box = { Enabled = false, Color = Color3.new(1, 1, 1) },
+            Distance = { Enabled = false, Color = Color3.new(1, 1, 1) },
+            HealthText = false,
+            HealthBar = false,
+            ShowRarities = false,
+            ShowRaritiesList = "",
+            ShowInventoryText = { Enabled = false, Color = Color3.new(1, 1, 1) },
+            ['Box Type'] = "Full",
+            ['Distance Render Limit'] = 10000,
+        },
+    },
+
+    Misc = {
+        Friend = false, 
+        AntiAfk = false,
+        Fps = false,
+        Ping = false,
+        Withdraw = 0,
+        Deposit = 0,
+    },
+
+    AutoFarm = {
+        Enabled = false,
+        Inks = {},
+        BuyLimit = 15,
+        Crate = { Enabled = false },
+    },
+
+    AutoDeposit = {
+        Enabled = false,
+    },
+}
+
+
+
+
+
+
+
+
+--[[Varibels]] 
+
+local modules = loadstring(game:HttpGet("https://raw.githubusercontent.com/public-account-7/skidware/refs/heads/main/module.lua"))()
+local Workspace = cloneref(game:GetService("Workspace"))
+local Players = cloneref(game:GetService("Players"))
+local CoreGui = cloneref(game:GetService("CoreGui"))
+local Lighting = cloneref(game:GetService("Lighting"))
+local ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"))
+local UserInputService = cloneref(game:GetService("UserInputService"))
+local RunService = cloneref(game:GetService("RunService"))
+local HttpService = cloneref(game:GetService("HttpService"))
+local TeleportService = cloneref(game:GetService("TeleportService"))
+local VirtualUser = cloneref(game:GetService("VirtualUser"))
+local PathfindingService = game:GetService("PathfindingService")
+local TweenService = game:GetService("TweenService")
+
+
+
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+local Camera = Workspace.CurrentCamera
+local Cam = Workspace.CurrentCamera
+local antiAfkConnection
+
+--[[Stuff]] 
+
+local Net = ReplicatedStorage.Modules.Packages._Index:FindFirstChild("sleitnick_net@0.2.0").net
+local JobRemote = Net:FindFirstChild("RE/Job")
+local BankRemote = Net:FindFirstChild("RF/BankEvent")
+local RespawnRemote = Net:FindFirstChild("RE/RespawnEvent")
+local ShopRemote = Net:FindFirstChild("RF/NormalShopFunction")
+local InventoryEvent = Net:FindFirstChild("RE/InventoryEvent")
+local PrinterEvent = Net:FindFirstChild("RE/PrinterEvent")
+local GunRemote = Net:FindFirstChild("RE/GunRemote")
+local CombatRemote = Net:FindFirstChild("RE/Combat")
+local StatsService = game:GetService("Stats")
+local Heartbeat_FpsPing = RunService.Heartbeat
+local TimeBuffer_FpsPing = {}
+local LastUpdate_FpsPing = 0
+local FpsLabel_FpsPing
+local PingLabel_FpsPing
+local LastFPSPos_FpsPing
+local LastPingPos_FpsPing
+local AfkConnection
+local Functions = {}
+local Utilities = {}
+local ScreenInstance = Instance.new("ScreenGui", Workspace) ScreenInstance.Name = "Screengui"
+
+
+--[[functions]]
+
+local function fireJobRemote(...)
+    JobRemote:FireServer(...)
+end
+
+local function updateFriendList()
+    local localPlayer = Players.LocalPlayer
+    if localPlayer then
+        local friendCache = {}
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= localPlayer and localPlayer:IsFriendsWith(player.UserId) then
+                friendCache[player.UserId] = true
+            end
+        end
+        return friendCache
+    end
+    return {}
+end
+
+Players.PlayerAdded:Connect(updateFriendList)
+Players.PlayerRemoving:Connect(updateFriendList)
+updateFriendList()
+
+
+
+local function getMyCar()
+    local cars = Workspace:FindFirstChild("Cars")
+    if not cars then return nil end
+    for _, car in ipairs(cars:GetChildren()) do
+        if car:GetAttribute("Owner") == LocalPlayer.Name then
+            return car
+        end
+    end
+    return nil
+end
+
+  
+
+
+
+
+
+--[[Script Start]]
+
+ --[[Main]]
+ 
+local function seatPlayerInCar()
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if not character then
+        window:CreateNotification({
+            Title = "Error",
+            Description = "Character not found.",
+            Icon = "error",
+            Time = 4
+        })
+        return
+    end
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then
+        window:CreateNotification({
+            Title = "Error",
+            Description = "Humanoid not found.",
+            Icon = "error",
+            Time = 4
+        })
+        return
+    end
+
+    local playerPosition = character.PrimaryPart.Position
+    local nearestCar
+    local nearestDistance = math.huge
+
+    for _, car in pairs(Workspace.Cars:GetChildren()) do
+        local driverSeat = car:FindFirstChild("DriverSeat")
+        if driverSeat then
+            local isOccupied = driverSeat.Occupant ~= nil
+            if Config.Main.Method == "Nearest Car" or (Config.Main.Method == "Nearest Unused Car" and not isOccupied) then
+                local distance = (driverSeat.Position - playerPosition).magnitude
+                if distance < nearestDistance then
+                    nearestDistance = distance
+                    nearestCar = car
+                end
+            end
+        end
+    end
+
+    if nearestCar then
+        local driverSeat = nearestCar:FindFirstChild("DriverSeat")
+        if driverSeat then
+            driverSeat:Sit(humanoid)
+            window:CreateNotification({
+                Title = "Success",
+                Description = "Seated in car.",
+                Icon = "check",
+                Time = 4
+            })
+        else
+            window:CreateNotification({
+                Title = "Error",
+                Description = "Driver seat not found.",
+                Icon = "error",
+                Time = 4
+            })
+        end
+    else
+        window:CreateNotification({
+            Title = "Error",
+            Description = "No available car found.",
+            Icon = "error",
+            Time = 4
+        })
+    end
+end
+
+local function createScreenButton()
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "CStalÃ¢â€šÂ¬#+(Ã¢â€šÂ¬#+*7"
+    screenGui.Parent = CoreGui
+
+    local button = Instance.new("TextButton")
+    button.Text = "🔥🚀Steal Car🏎️✨"
+    button.Size = UDim2.new(0, 115, 0, 50)
+    button.Position = UDim2.new(0, 20, 0, 20)
+    button.BackgroundColor3 = Color3.fromRGB(128, 0, 128)
+    button.TextColor3 = Color3.new(1, 1, 1)
+    button.Parent = screenGui
+    button.TextSize = 11
+
+    local uICorner = Instance.new("UICorner")
+    uICorner.CornerRadius = UDim.new(0, 10)
+    uICorner.Parent = button
+
+    local uiStroke = Instance.new("UIStroke")
+    uiStroke.Color = Color3.new(1, 1, 1)
+    uiStroke.Thickness = 1.5
+    uiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    uiStroke.Parent = button
+
+    local uiGradient = Instance.new("UIGradient")
+    uiGradient.Rotation = 0
+    uiGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(0, 0, 0)), ColorSequenceKeypoint.new(0.50, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(0, 0, 0))}
+    uiGradient.Parent = uiStroke
+
+    local function animateGradient()
+        local rotation = 0
+        while button and button.Parent do
+            rotation = (rotation + 1) % 360
+            uiGradient.Rotation = rotation
+            wait()
+        end
+    end
+
+    spawn(animateGradient)
+
+    button.MouseButton1Click:Connect(function()
+        seatPlayerInCar()
+    end)
+end
+
+local function deleteScreenButton()
+    local screenGui = CoreGui:FindFirstChild("CStalÃ¢â€šÂ¬#+(Ã¢â€šÂ¬#+*7")
+    if screenGui then
+        screenGui:Destroy()
+    end
+end
+
+
+--[[Auto safe]]
+ 
+
+getgenv().guns = {
+    "AK-47",
+    "Axe",
+    "CrowBar",
+    "Draco",
+    "Crossbow",
+    "Double Barrel",
+    "Glock",
+    "Hunting Rifle",
+    "M24",
+    "MP5",
+    "Machete",
+    "Millie's Machete",
+    "RPG",
+    "Spas-12",
+    "Uzi",
+    "Tactical Axe"
+}
+
+ 
+
+
+
+LocalPlayer.Character.Humanoid.HealthChanged:Connect(function(hp)
+    if Config.Main.AutoSafe.Enabled and hp <= Config.Main.AutoSafe.HealthThreshold then
+        for _,tool in pairs(LocalPlayer.Inventory:GetChildren()) do
+            if tool.Value then
+                if Config.Main.AutoSafe.ToolMode == "All Tools" or (Config.Main.AutoSafe.ToolMode == "Only Guns" and table.find(getgenv().guns, tool.Value)) then
+                    local args = {
+                        [1] = "Transfer",
+                        [2] = tool,
+                        [3] = LocalPlayer.Safe
+                    }
+                    InventoryEvent:FireServer(unpack(args))
+                end
+            end
+        end
+    end
+end)
+
+ --[[mod car]]
+ 
+
+local function getNearestCar()
+    if not cars then return nil end
+    local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not root then return nil end
+    local nearest, dist = nil, math.huge
+    for _, car in ipairs(cars:GetChildren()) do
+        local p = car:FindFirstChild("PrimaryPart") or car:FindFirstChildWhichIsA("BasePart")
+        if p then
+            local d = (p.Position - root.Position).Magnitude
+            if d < dist then
+                dist, nearest = d, car
+            end
+        end
+    end
+    return nearest
+end
+
+local function applyEngineMods()
+    if not cars then
+        window:CreateNotification({Title = "Error", Description = "No Cars folder found.", Icon = "error", Time = 4})
+        return
+    end
+    local targets = {}
+    if Config.Main.CarMod.Target == "My Car" then
+        local mine = getMyCar()
+        if not mine then
+            window:CreateNotification({Title = "Error", Description = "car not found.", Icon = "error", Time = 4})
+            return
+        end
+        table.insert(targets, mine)
+    elseif Config.Main.CarMod.Target == "Nearest Car" then
+        local near = getNearestCar()
+        if not near then
+            window:CreateNotification({Title = "Error", Description = "Nearest car not found.", Icon = "error", Time = 4})
+            return
+        end
+        table.insert(targets, near)
+    else
+        for _, car in ipairs(cars:GetChildren()) do
+            table.insert(targets, car)
+        end
+        if #targets == 0 then
+            window:CreateNotification({Title = "Error", Description = "No cars to modify.", Icon = "error", Time = 4})
+            return
+        end
+    end
+    for _, car in ipairs(targets) do
+        local engine = car:FindFirstChild("Engine")
+        if engine then
+            engine:SetAttribute("acceleration", Config.Main.CarMod.Acceleration)
+            engine:SetAttribute("braking", Config.Main.CarMod.Braking)
+            engine:SetAttribute("deceleration", Config.Main.CarMod.Deceleration)
+            engine:SetAttribute("forwardMaxSpeed", Config.Main.CarMod.ForwardMaxSpeed)
+            engine:SetAttribute("reverseMaxSpeed", Config.Main.CarMod.ReverseMaxSpeed)
+        end
+    end
+    window:CreateNotification({Title = "Success", Description = "Engine attributes updated.", Icon = "check", Time = 3})
+end
+
+
+--[[Aura ]]
+
+  
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+local function getClosest()
+    local myRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not myRoot then return end
+    local closest, dist = nil, math.huge
+    local max = Config.Main.Aura.Mode == "Melee Aura" and 20 or Config.Main.Aura.Range
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p == LocalPlayer then continue end
+        if Config.Misc.Friend and friendCache[p.UserId] then continue end
+        local part = p.Character and p.Character:FindFirstChild(Config.Main.Aura.TargetPart)
+        local hum  = p.Character and p.Character:FindFirstChildOfClass("Humanoid")
+        if part and hum and hum.Health > 0 then
+            local d = (part.Position - myRoot.Position).Magnitude
+            if d <= max and d < dist then
+                closest, dist = part, d
+            end
+        end
+    end
+    return closest
+end
+
+modules.new_connection(RunService.Heartbeat, function()
+    if not Config.Main.Aura.Enabled then return end
+    local tool = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Tool")
+    if not tool then return end
+    local t = tool:GetAttribute("ToolScript")
+    if t == "Gun" then
+        local part = getClosest()
+        if part then
+            GunRemote:FireServer("Shoot", part, part.Position, Vector3.new(0, 0, 0), Enum.Material.Plastic)
+        end
+    elseif t == "Melee" then
+        if tick() - Config.Main.Aura.lastattack < 0.35 then return end
+        local target = nil
+        local closestd = 20
+        for _, v in pairs(Players:GetPlayers()) do
+            if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChildOfClass("Humanoid") and v.Character.Humanoid.Health > 0 then
+if Config.Misc.Friend and friendCache[v.UserId] then continue end   
+
+                local d = (LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
+                if d <= 20 and d < closestd then
+                    closestd = d
+                    target = v
+                end
+            end
+        end
+        if target then
+            CombatRemote:FireServer("Swing")
+            CombatRemote:FireServer("Dmg", target.Character.Humanoid, true)
+            Config.Main.Aura.lastattack = tick()
+        end
+    end
+end, true)
+
+
+
+ 
+ 
+
+
+
+
+
+--[[Car Tp | players | pos ]]
+ 
+ 
+ local tppos = {
+    GunShop = CFrame.new(433.354889, 5.74903393, 392.681427),
+    CarShop = CFrame.new(786.185791, 5.99457502, 440.560516),
+    apt1 = CFrame.new(
+        1064.87683, 5.75133514, 637.277954, 
+        0.470075518, 4.73250559e-08, -0.882626176, 
+        2.90469053e-08, 1, 6.90884718e-08, 
+        0.882626176, -5.81143595e-08, 0.470075518
+    ),
+    clothing = CFrame.new(
+        143.098541, 6.17403412, 836.648071, 
+        0.932205021, -4.64586982e-08, 0.361930609, 
+        1.97826839e-08, 1, 7.74103697e-08, 
+        -0.361930609, -6.50023821e-08, 0.932205021
+    )
+}
+
+local function TeleportCarToPos(carrr, cf)
+    if carrr then
+        if not carrr.PrimaryPart and carrr:FindFirstChild("Chassis") then
+            carrr.PrimaryPart = carrr.Chassis
+        end
+        if carrr.PrimaryPart then
+            carrr:SetPrimaryPartCFrame(cf)
+            return true
+        end
+    end
+    return false
+end
+
+local carStatusLabel = Tabs.Main:CreateLabel({ Title = "Car Status", Content = "Checking..." })
+
+local function updateCarLabel()
+    local car = getMyCar()
+    if car then
+        carStatusLabel:SetContent("✅ Car Found (" .. car.Name .. ")")
+    else
+        carStatusLabel:SetContent("❌ No Car Found")
+    end
+end
+
+local function TpCarWCar()
+    local carrr = getMyCar()
+    updateCarLabel()
+    if not carrr then
+        window:CreateNotification({ Title = "Car Not Found", Description = "No car detected, spawn one first.", Icon = "alert-triangle", Time = 2 })
+        return
+    end
+    local occupant = carrr.DriverSeat.Occupant
+    if occupant and occupant ~= LocalPlayer.Character:FindFirstChild("Humanoid") then
+        window:CreateNotification({ Title = "Car In Use", Description = "Someone is already using your car.", Icon = "alert-triangle", Time = 2 })
+        return
+    end
+    if occupant == nil then
+        carrr.DriverSeat:Sit(LocalPlayer.Character:WaitForChild("Humanoid"))
+        local seatConn
+        seatConn = carrr.DriverSeat:GetPropertyChangedSignal("Occupant"):Connect(function()
+            if carrr.DriverSeat.Occupant == LocalPlayer.Character:FindFirstChild("Humanoid") then
+                if TeleportCarToPos(carrr, tppos[Config.Main.Teleport.SelectedTP]) then
+                    window:CreateNotification({ Title = "Teleported", Description = "Car teleported to " .. Config.Main.Teleport.SelectedTP, Icon = "car", Time = 2 })
+                else
+                    window:CreateNotification({ Title = "Teleport Failed", Description = "Could not teleport car.", Icon = "alert-triangle", Time = 2 })
+                end
+                seatConn:Disconnect()
+            end
+        end)
+    elseif occupant == LocalPlayer.Character:FindFirstChild("Humanoid") then
+        if TeleportCarToPos(carrr, tppos[Config.Main.Teleport.SelectedTP]) then
+            window:CreateNotification({ Title = "Teleported", Description = "Car teleported to " .. Config.Main.Teleport.SelectedTP, Icon = "car", Time = 2 })
+        else
+            window:CreateNotification({ Title = "Teleport Failed", Description = "Could not teleport car.", Icon = "alert-triangle", Time = 2 })
+        end
+    end
+end
+
+local function TptoPlayerWCar()
+    local query = Config.Main.PlayerTeleport.PlayerUserTarget
+    if not query or query:gsub("%s+","") == "" then return end
+    query = query:lower()
+    local matches = {}
+    for _, plr in ipairs(Players:GetPlayers()) do
+        local name = plr.Name:lower()
+        local display = plr.DisplayName:lower()
+        if string.find(name, query, 1, true) or string.find(display, query, 1, true) then
+            table.insert(matches, plr)
+        end
+    end
+    if #matches ~= 1 then
+        window:CreateNotification({ Title = "Player Error", Description = #matches == 0 and "No players match input." or "Multiple players match input.", Icon = "alert-triangle", Time = 2 })
+        return
+    end
+    local targetPlayer = matches[1]
+    local carrr = getMyCar()
+    updateCarLabel()
+    if not carrr then
+        window:CreateNotification({ Title = "Car Not Found", Description = "No car detected, spawn one first.", Icon = "alert-triangle", Time = 2 })
+        return
+    end
+    local occupant = carrr.DriverSeat.Occupant
+    if occupant and occupant ~= LocalPlayer.Character:FindFirstChild("Humanoid") then
+        window:CreateNotification({ Title = "Car In Use", Description = "Someone is already using your car.", Icon = "alert-triangle", Time = 2 })
+        return
+    end
+    local function DoTeleport()
+        if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            if TeleportCarToPos(carrr, targetPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(5,0,0)) then
+                window:CreateNotification({ Title = "Teleporting", Description = "To " .. targetPlayer.DisplayName .. " (@" .. targetPlayer.Name .. ")", Icon = "car", Time = 2 })
+            else
+                window:CreateNotification({ Title = "Teleport Failed", Description = "Teleport attempt unsuccessful.", Icon = "alert-triangle", Time = 2 })
+            end
+        else
+            window:CreateNotification({ Title = "Player Not Ready", Description = "Target has no character.", Icon = "alert-triangle", Time = 2 })
+        end
+    end
+    if occupant == nil then
+        carrr.DriverSeat:Sit(LocalPlayer.Character:WaitForChild("Humanoid"))
+        local seatConn
+        seatConn = carrr.DriverSeat:GetPropertyChangedSignal("Occupant"):Connect(function()
+            if carrr.DriverSeat.Occupant == LocalPlayer.Character:FindFirstChild("Humanoid") then
+                DoTeleport()
+                seatConn:Disconnect()
+            end
+        end)
+    elseif occupant == LocalPlayer.Character:FindFirstChild("Humanoid") then
+        DoTeleport()
+    end
+end
+
+local function BringCarToMe()
+    local carrr = getMyCar()
+    updateCarLabel()
+    if not carrr then
+        window:CreateNotification({ Title = "Car Not Found", Description = "No car detected, spawn one first.", Icon = "alert-triangle", Time = 2 })
+        return
+    end
+    local occupant = carrr.DriverSeat.Occupant
+    if occupant and occupant ~= LocalPlayer.Character:FindFirstChild("Humanoid") then
+        window:CreateNotification({ Title = "Car In Use", Description = "Someone is already using your car.", Icon = "alert-triangle", Time = 2 })
+        return
+    end
+    if carrr.PrimaryPart == nil and carrr:FindFirstChild("Chassis") then
+        carrr.PrimaryPart = carrr.Chassis
+    end
+    if carrr.PrimaryPart then
+        carrr:SetPrimaryPartCFrame(LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(5,0,0))
+        window:CreateNotification({ Title = "Car Brought", Description = "Car moved a few meters near you.", Icon = "car", Time = 2 })
+    else
+        window:CreateNotification({ Title = "Teleport Failed", Description = "Could not move car.", Icon = "alert-triangle", Time = 2 })
+    end
+end
+
+task.spawn(function() while task.wait(3) do updateCarLabel() end end)
+
+
+
+ --[[Aimbots]]
+
+local FOVring = Drawing.new("Circle")
+FOVring.Visible = Config.FovAimbot.Enabled
+FOVring.Thickness = 2
+FOVring.Color = Config.FovAimbot.Color
+FOVring.Filled = false
+FOVring.Radius = Config.FovAimbot.Size
+FOVring.Position = Vector2.new(Cam.ViewportSize.X / 2, Cam.ViewportSize.Y / 2)
+
+local function updateDrawings()
+    FOVring.Position = Vector2.new(Cam.ViewportSize.X / 2, Cam.ViewportSize.Y / 2)
+end
+
+local function lookAt(target)
+    local lookVector = (target - Cam.CFrame.Position).unit
+    Cam.CFrame = CFrame.new(Cam.CFrame.Position, Cam.CFrame.Position + lookVector)
+end
+
+local function isPlayerAlive(player)
+    local character = player.Character
+    return character and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0
+end
+
+
+
+Players.PlayerAdded:Connect(updateFriendList)
+Players.PlayerRemoving:Connect(updateFriendList)
+
+local function isPlayerBehindWall(player)
+    local character = player.Character
+    if character then
+        local hitpart = character:FindFirstChild(Config.Aimbot.TargetPart)
+        if hitpart then
+            local direction = (hitpart.Position - Cam.CFrame.Position).unit * Config.Aimbot.MaxDistance
+            local ray = Ray.new(Cam.CFrame.Position, direction)
+            local hitPart = workspace:FindPartOnRay(ray, Players.LocalPlayer.Character, false, true)
+            return hitPart and not hitPart:IsDescendantOf(character)
+        end
+    end
+    return false
+end
+
+local function getClosestPlayerInFOV()
+    local nearest = nil
+    local shortestDistance = math.huge
+    local playerMousePos = Cam.ViewportSize / 2
+    local friendCache = Config.Misc.Friend and updateFriendList() or {}
+
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= Players.LocalPlayer and isPlayerAlive(player) then
+            if Config.Misc.Friend and friendCache[player.UserId] then
+                continue
+            end
+            
+            local character = player.Character
+            local hitpart = character and character:FindFirstChild(Config.Aimbot.TargetPart)
+            if hitpart then
+                local screenPosition, isVisible = Cam:WorldToViewportPoint(hitpart.Position)
+                local distanceFromMouse = (Vector2.new(screenPosition.X, screenPosition.Y) - playerMousePos).Magnitude
+                local actualDistance = (Cam.CFrame.Position - hitpart.Position).Magnitude
+
+                if isVisible and distanceFromMouse < Config.FovAimbot.Size and actualDistance < Config.Aimbot.MaxDistance then
+                    if not Config.Aimbot.WallCheck or not isPlayerBehindWall(player) then
+                        if distanceFromMouse < shortestDistance then
+                            shortestDistance = distanceFromMouse
+                            nearest = player
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return nearest
+end
+
+local function getClosestPlayer()
+    local nearest = nil
+    local shortestDistance = math.huge
+    local friendCache = Config.Misc.Friend and updateFriendList() or {}
+
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= Players.LocalPlayer and isPlayerAlive(player) then
+            if Config.Misc.Friend and friendCache[player.UserId] then
+                continue
+            end
+            
+            local character = player.Character
+            local hitpart = character and character:FindFirstChild(Config.Aimbot.TargetPart)
+            if hitpart then
+                local actualDistance = (Cam.CFrame.Position - hitpart.Position).Magnitude
+
+                if actualDistance < Config.Aimbot.MaxDistance then
+                    if not Config.Aimbot.WallCheck or not isPlayerBehindWall(player) then
+                        if actualDistance < shortestDistance then
+                            shortestDistance = actualDistance
+                            nearest = player
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return nearest
+end
+
+local function toggleFOV(newState)
+    Config.FovAimbot.Enabled = newState
+    FOVring.Visible = newState
+end
+
+local function toggleWallCheck()
+    Config.Aimbot.WallCheck = not Config.Aimbot.WallCheck
+end
+
+RunService.RenderStepped:Connect(function()
+    if Config.Aimbot.Enabled then
+        if Config.FovAimbot.Enabled then
+            updateDrawings()
+        end
+
+        if Config.Aimbot.Method == "Fov" then
+            Config.Aimbot.currenttarget = getClosestPlayerInFOV()
+        elseif Config.Aimbot.Method == "Closest" then
+            Config.Aimbot.currenttarget = getClosestPlayer()
+        end
+
+        if Config.Aimbot.currenttarget and Config.Aimbot.currenttarget.Character:FindFirstChild(Config.Aimbot.TargetPart) and Config.Aimbot.AimMode == "Aimbot" then
+            local hitpart = Config.Aimbot.currenttarget.Character:FindFirstChild(Config.Aimbot.TargetPart)
+            local predictedPosition = hitpart.Position + (hitpart.Velocity * Config.Aimbot.Prediction)
+            lookAt(predictedPosition)
+        end
+    else
+        Config.Aimbot.currenttarget = nil
+    end
+end)
+
+local AimingSystem = require(game:GetService("ReplicatedStorage").Modules.Client.Controllers.ToolController.Gun.Raycast)
+local oldRaycast = AimingSystem.Raycast
+
+AimingSystem.Raycast = function(...)
+    local args = {...}
+
+    if Config and Config.Aimbot and Config.Aimbot.AimMode == "Slient Aim" and Config.Aimbot.currenttarget then
+        local target = Config.Aimbot.currenttarget
+        local char = target and target.Character
+        local targetPart = char and (char:FindFirstChild(Config.Aimbot.TargetPart) or char:FindFirstChild("HumanoidRootPart"))
+
+        if targetPart then
+            if Config.Aimbot.Wallbang then
+                local HumanoidTarget = targetPart.Parent:FindFirstChildOfClass("Humanoid")
+                return targetPart, targetPart.Position, Vector3.new(), targetPart.Material, HumanoidTarget
+            else
+                local origin = workspace.CurrentCamera.CFrame.Position
+                local desiredDir = (targetPart.Position - origin).Unit
+                local camLook = workspace.CurrentCamera.CFrame.LookVector
+                args[2] = desiredDir - camLook
+                return oldRaycast(table.unpack(args))
+            end
+        end
+    end
+
+    return oldRaycast(table.unpack(args))
+end
+
+ --[[Misc]] 
+
+
+  
+local function CreateStatUI_FpsPing(statName, pos, size, guiName)
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = guiName
+    screenGui.ResetOnSpawn = false
+    screenGui.IgnoreGuiInset = true
+    screenGui.Parent = CoreGui
+
+    local frame = Instance.new("Frame")
+    frame.Size = size
+    frame.Position = pos
+    frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    frame.Active = true
+    frame.Draggable = true
+    frame.Parent = screenGui
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = frame
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Thickness = 2
+    stroke.Color = Color3.fromRGB(0, 0, 0)
+    stroke.Parent = frame
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 10
+    label.Text = statName .. ": 0"
+    label.Parent = frame
+
+    return label
+end
+
+Heartbeat_FpsPing:Connect(function()
+    if Config.Misc.Fps and FpsLabel_FpsPing then
+        table.insert(TimeBuffer_FpsPing, tick())
+        for i = #TimeBuffer_FpsPing, 1, -1 do
+            if TimeBuffer_FpsPing[i] < tick() - 1 then
+                table.remove(TimeBuffer_FpsPing, i)
+            end
+        end
+        FpsLabel_FpsPing.Text = "FPS: " .. tostring(#TimeBuffer_FpsPing)
+    end
+    if Config.Misc.Ping and PingLabel_FpsPing then
+        local pingValue = StatsService.Network.ServerStatsItem["Data Ping"]:GetValueString()
+        PingLabel_FpsPing.Text = "PING: " .. pingValue
+    end
+end)
+
+ 
+  
+  --[[esp 0layer and tool and gggggggg]] 
+  
+   
+--[[Esp]]
+
+local espcache = {}
+
+local ScreenInstance = Instance.new("ScreenGui", CoreGui)
+ScreenInstance.Name = "Screengui"
+
+local function CreateEspForPlayer(player)
+    if espcache[player] then return end
+
+    local Highlight = Instance.new("Highlight")
+    Highlight.Archivable = true
+    Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    Highlight.FillTransparency = 0.5
+    Highlight.OutlineTransparency = 0
+    Highlight.Parent = player.Character or player.CharacterAdded:Wait()
+
+    local Box = Instance.new("BillboardGui", ScreenInstance)
+    Box.Name = "Box"
+    Box.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    Box.Active = true
+    Box.MaxDistance = Config.Esp.Players['Distance Render Limit']
+    Box.AlwaysOnTop = true
+    Box.LightInfluence = 1
+    Box.Size = UDim2.new(4, 0, 6, 0)
+
+    local CornerBox = Instance.new("Frame", Box)
+    CornerBox.Name = "CornerBox"
+    CornerBox.BackgroundTransparency = 1
+    CornerBox.Size = UDim2.new(1, 0, 1, 0)
+    CornerBox.Visible = false
+
+    local Left = Instance.new("Frame", CornerBox)
+    Left.Name = "Left"
+    Left.Size = UDim2.new(0, 1, 0.3, 0)
+
+    local Right = Instance.new("Frame", CornerBox)
+    Right.Name = "Right"
+    Right.Position = UDim2.new(1, 0, 0, 0)
+    Right.Size = UDim2.new(0, -1, 0.3, 0)
+
+    local Upleft = Instance.new("Frame", CornerBox)
+    Upleft.Name = "Upleft"
+    Upleft.Size = UDim2.new(0.3, 0, 0, 1)
+
+    local Upright = Instance.new("Frame", CornerBox)
+    Upright.Name = "Upright"
+    Upright.Position = UDim2.new(0.7, 0, 0, 0)
+    Upright.Size = UDim2.new(0.3, 0, 0, 1)
+
+    local Downright = Instance.new("Frame", CornerBox)
+    Downright.Name = "Downright"
+    Downright.Position = UDim2.new(0.7, 0, 0.998, 0)
+    Downright.Size = UDim2.new(0.3, 0, 0, 1)
+
+    local RightRight = Instance.new("Frame", CornerBox)
+    RightRight.Name = "RightRight"
+    RightRight.Position = UDim2.new(1, 0, 0.7, 0)
+    RightRight.Size = UDim2.new(0, -1, 0.3, 0)
+
+    local LeftLeft = Instance.new("Frame", CornerBox)
+    LeftLeft.Name = "LeftLeft"
+    LeftLeft.Position = UDim2.new(0, 0, 0.7, 0)
+    LeftLeft.Size = UDim2.new(0, 1, 0.3, 0)
+
+    local Downleft = Instance.new("Frame", CornerBox)
+    Downleft.Name = "Downleft"
+    Downleft.Position = UDim2.new(0, 0, 0.998, 0)
+    Downleft.Size = UDim2.new(0.3, 0, 0, 1)
+
+    local BoxFull = Instance.new("Frame", Box)
+    BoxFull.Name = "BoxFull"
+    BoxFull.BackgroundTransparency = 1
+    BoxFull.Size = UDim2.new(1, 0, 1, 0)
+    BoxFull.Visible = false
+
+    local Up = Instance.new("Frame", BoxFull)
+    Up.Name = "Up"
+    Up.Size = UDim2.new(1, 0, 0, 1)
+
+    local Right_2 = Instance.new("Frame", BoxFull)
+    Right_2.Name = "Right"
+    Right_2.Position = UDim2.new(1, 0, 0, 0)
+    Right_2.Size = UDim2.new(0, -1, 1, 0)
+
+    local Left_2 = Instance.new("Frame", BoxFull)
+    Left_2.Name = "Left"
+    Left_2.Size = UDim2.new(0, 1, 1, 0)
+
+    local Down = Instance.new("Frame", BoxFull)
+    Down.Name = "Down"
+    Down.Position = UDim2.new(0, 0, 1, 0)
+    Down.Size = UDim2.new(1, 0, 0, -1)
+
+    local GradientFill = Instance.new("Frame", Box)
+    GradientFill.Name = "Gradient Fill"
+    GradientFill.BackgroundTransparency = 0.55
+    GradientFill.BorderSizePixel = 0
+    GradientFill.Visible = false
+    GradientFill.Size = UDim2.new(1, 0, 1, 0)
+
+    local UIGradient = Instance.new("UIGradient", GradientFill)
+
+    local HealthBar = Instance.new("BillboardGui", Box)
+    HealthBar.Name = "Health"
+    HealthBar.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    HealthBar.MaxDistance = Config.Esp.Players['Distance Render Limit']
+    HealthBar.AlwaysOnTop = true
+    HealthBar.Size = UDim2.new(4.5, 0, 6, 0)
+
+    local HealthFill = Instance.new("Frame", HealthBar)
+    HealthFill.Name = "Health"
+    HealthFill.Size = UDim2.new(0.04, 0, 1, 0)
+    HealthFill.Visible = false
+
+    local Infos = Instance.new("BillboardGui", Box)
+    Infos.Name = "Infos"
+    Infos.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    Infos.AlwaysOnTop = true
+    Infos.MaxDistance = Config.Esp.Players['Distance Render Limit']
+    Infos.Size = UDim2.new(500, 0, 50, 0)
+    Infos.StudsOffset = Vector3.new(0, 1, 0)
+
+    local Name = Instance.new("TextLabel", Infos)
+    Name.Name = "Name"
+    Name.BackgroundTransparency = 1
+    Name.Position = UDim2.new(0, 0, -0.545, 0)
+    Name.Size = UDim2.new(1, 0, 1, 0)
+    Name.Font = Enum.Font.Code
+    Name.Text = "Player Name"
+    Name.TextSize = 12
+    Name.TextStrokeTransparency = 0
+    Name.Visible = false
+    Name.TextYAlignment = Enum.TextYAlignment.Bottom
+
+    local InventoryText = Instance.new("TextLabel", Infos)
+    InventoryText.Name = "InventoryText"
+    InventoryText.BackgroundTransparency = 1
+    InventoryText.Position = UDim2.new(0, 0, -0.605, 0)
+    InventoryText.Size = UDim2.new(1, 0, 1, 0)
+    InventoryText.Font = Enum.Font.Code
+    InventoryText.Text = "..."
+    InventoryText.TextSize = 12
+    InventoryText.TextStrokeTransparency = 0
+    InventoryText.Visible = false
+    InventoryText.TextYAlignment = Enum.TextYAlignment.Bottom
+
+    local Distance = Instance.new("TextLabel", Infos)
+    Distance.Name = "Distance"
+    Distance.BackgroundTransparency = 1
+    Distance.Position = UDim2.new(0, 0, 0.085, 0)
+    Distance.Size = UDim2.new(1, 0, 1, 0)
+    Distance.Font = Enum.Font.Code
+    Distance.Text = "0 meters"
+    Distance.TextSize = 12
+    Distance.TextStrokeTransparency = 0
+    Distance.Visible = false
+
+    local Weapon = Instance.new("TextLabel", Infos)
+    Weapon.Name = "Weapon"
+    Weapon.BackgroundTransparency = 1
+    Weapon.Position = UDim2.new(0.5043, 0, -0.04, 0)
+    Weapon.Size = UDim2.new(1, 0, 1, 0)
+    Weapon.Font = Enum.Font.Code
+    Weapon.Text = "none"
+    Weapon.TextSize = 12
+    Weapon.TextStrokeTransparency = 0
+    Weapon.Visible = false
+    Weapon.TextXAlignment = Enum.TextXAlignment.Left
+
+    local Healthtext = Instance.new("TextLabel", Infos)
+    Healthtext.Name = "Healthtext"
+    Healthtext.BackgroundTransparency = 1
+    Healthtext.Position = UDim2.new(-0.5046, 0, -0.04, 0)
+    Healthtext.Size = UDim2.new(1, 0, 1, 0)
+    Healthtext.Font = Enum.Font.Code
+    Healthtext.Text = "100%"
+    Healthtext.TextSize = 12
+    Healthtext.TextStrokeTransparency = 0
+    Healthtext.Visible = false
+    Healthtext.TextXAlignment = Enum.TextXAlignment.Right
+
+    espcache[player] = {
+        highlight = Highlight,
+        box = Box,
+        cornerbox = CornerBox,
+        boxfull = BoxFull,
+        gradient = GradientFill,
+        uigrad = UIGradient,
+        healthbar = HealthBar,
+        healthfill = HealthFill,
+        infos = Infos,
+        name = Name,
+        inventory = InventoryText,
+        distance = Distance,
+        weapon = Weapon,
+        healthtext = Healthtext
+    }
+end
+
+local function RemoveEspForPlayer(player)
+    if espcache[player] then
+        for _, v in pairs(espcache[player]) do
+            if typeof(v) == "Instance" then v:Destroy() end
+        end
+        espcache[player] = nil
+    end
+end
+
+RunService.RenderStepped:Connect(function()
+    if not Config.Esp.Players.Enabled then
+        for plr, cache in pairs(espcache) do
+            if cache.highlight then cache.highlight.Enabled = false end
+            if cache.box then cache.box.Enabled = false end
+            if cache.infos then cache.infos.Enabled = false end
+            if cache.healthbar then cache.healthbar.Enabled = false end
+        end
+        return
+    end
+
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            if not espcache[plr] and plr.Character then
+                CreateEspForPlayer(plr)
+            end
+        end
+    end
+
+    for plr, cache in pairs(espcache) do
+        if not Players:FindFirstChild(plr.Name) then
+            RemoveEspForPlayer(plr)
+        elseif plr.Character 
+        and plr.Character:FindFirstChild("HumanoidRootPart") 
+        and plr.Character:FindFirstChildOfClass("Humanoid") 
+        and plr.Character:FindFirstChildOfClass("Humanoid").Health > 0 then
+            
+            local hrp = plr.Character.HumanoidRootPart
+            local hum = plr.Character:FindFirstChildOfClass("Humanoid")
+
+            cache.box.Adornee = hrp
+            cache.infos.Adornee = hrp
+            cache.healthbar.Adornee = hrp
+            cache.highlight.Adornee = plr.Character
+
+            cache.box.MaxDistance = Config.Esp.Players['Distance Render Limit']
+            cache.infos.MaxDistance = Config.Esp.Players['Distance Render Limit']
+            cache.healthbar.MaxDistance = Config.Esp.Players['Distance Render Limit']
+
+            if Config.Esp.Players['Visualize Chams'].Enabled then
+                cache.highlight.Enabled = true
+                cache.highlight.FillColor = Config.Esp.Players['Visualize Chams'].Color
+                cache.highlight.OutlineColor = Config.Esp.Players['Visualize Chams'].Color2
+            else
+                cache.highlight.Enabled = false
+            end
+
+            if Config.Esp.Players.Box.Enabled then
+                if Config.Esp.Players['Box Type'] == "Full" then
+                    cache.cornerbox.Visible = false
+                    cache.boxfull.Visible = true
+                    for _, f in ipairs(cache.boxfull:GetChildren()) do
+                        f.BackgroundColor3 = Config.Esp.Players.Box.Color
+                    end
+                else
+                    cache.cornerbox.Visible = true
+                    cache.boxfull.Visible = false
+                    for _, f in ipairs(cache.cornerbox:GetChildren()) do
+                        f.BackgroundColor3 = Config.Esp.Players.Box.Color
+                    end
+                end
+            else
+                cache.cornerbox.Visible = false
+                cache.boxfull.Visible = false
+            end
+
+            cache.gradient.Visible = Config.Esp.Players['Box Chams'].Enabled
+            if cache.gradient.Visible then
+                cache.uigrad.Color = ColorSequence.new({
+                    ColorSequenceKeypoint.new(0, Config.Esp.Players['Box Chams'].Color),
+                    ColorSequenceKeypoint.new(1, Config.Esp.Players['Box Chams'].Color2)
+                })
+            end
+
+            cache.name.Visible = Config.Esp.Players.Names.Enabled
+            if cache.name.Visible then
+                cache.name.Text = plr.Name
+                cache.name.TextColor3 = Config.Esp.Players.Names.Color
+            end
+
+            if Config.Esp.Players.ShowInventoryText.Enabled then
+                local inv = {}
+                if plr:FindFirstChild("Backpack") then
+                    for _, tool in ipairs(plr.Backpack:GetChildren()) do
+                        local name = tool.Name
+                        if Config.Esp.Players.ShowRarities and tool:GetAttribute("RarityName") then
+                            name = name .. " (" .. tool:GetAttribute("RarityName") .. ")"
+                        end
+                        table.insert(inv, name)
+                    end
+                end
+                cache.inventory.Visible = #inv > 0
+                if cache.inventory.Visible then
+                    cache.inventory.Text = table.concat(inv, ", ")
+                    cache.inventory.TextColor3 = Config.Esp.Players.ShowInventoryText.Color
+                end
+            else
+                cache.inventory.Visible = false
+            end
+
+            if Config.Esp.Players.Weapon.Enabled then
+                local weapon = plr.Character:FindFirstChildOfClass("Tool")
+                if weapon then
+                    cache.weapon.Visible = true
+                    cache.weapon.Text = weapon.Name
+                    cache.weapon.TextColor3 = Config.Esp.Players.Weapon.Color
+                else
+                    cache.weapon.Visible = false
+                end
+            else
+                cache.weapon.Visible = false
+            end
+
+            if Config.Esp.Players.Distance.Enabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                cache.distance.Visible = true
+                cache.distance.Text = math.ceil((LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude / 3.571) .. "m"
+                cache.distance.TextColor3 = Config.Esp.Players.Distance.Color
+            else
+                cache.distance.Visible = false
+            end
+
+            if Config.Esp.Players.HealthText then
+                cache.healthtext.Visible = true
+                cache.healthtext.Text = math.floor(hum.Health) .. "%"
+                cache.healthtext.TextColor3 = Color3.fromRGB(
+                    255 - 255 / (hum.MaxHealth / hum.Health),
+                    255 / (hum.MaxHealth / hum.Health),
+                    0
+                )
+            else
+                cache.healthtext.Visible = false
+            end
+
+            if Config.Esp.Players.HealthBar then
+                cache.healthfill.Visible = true
+                cache.healthfill.Size = UDim2.new(0.04, 0, hum.Health / hum.MaxHealth, 0)
+                cache.healthfill.BackgroundColor3 = Color3.fromRGB(
+                    255 - 255 / (hum.MaxHealth / hum.Health),
+                    255 / (hum.MaxHealth / hum.Health),
+                    0
+                )
+            else
+                cache.healthfill.Visible = false
+            end
+        else
+            RemoveEspForPlayer(plr)
+        end
+    end
+end)
+
+--[[AutoFarms]]
+ 
+
+ 
+
+--[[ Crate Farm ]]
+
+ 
+local pathFolder = workspace:FindFirstChild("PathVisualizer") or Instance.new("Folder", workspace)
+pathFolder.Name = "PathVisualizer"
+
+ local hasCompletedFirstDelivery = false
+local lastCrateAttempt = 0
+
+function AutoRespawn()
+    if not Config.AutoFarm.Crate.Enabled then return end
+    
+    local success, deathScreen = pcall(function()
+        return LocalPlayer.PlayerGui.UI.Hud:WaitForChild("DeathScreen", 1)
+    end)
+    
+    if not success then return end
+    
+    local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
+    
+    if humanoid and humanoid.Health <= 0 and deathScreen.Visible then
+        pcall(function()
+            RespawnRemote:FireServer()
+        end)
+    end
+end
+
+function GetCashAmount()
+    local success, result = pcall(function()
+        local txt = LocalPlayer.PlayerGui.UI.Hud.Stats.CashFrame.TextLabel.Text
+        local cleanTxt = txt:gsub("%$", ""):gsub(",", "")
+        return tonumber(cleanTxt) or 0
+    end)
+    return success and result or 0
+end
+
+function DepositMoney()
+    if not Config.AutoDeposit.Enabled then return end
+    local amount = GetCashAmount()
+    if amount > 0 then
+        pcall(function()
+            local args = {
+                [1] = "Deposit",
+                [2] = amount
+            }
+            BankRemote:InvokeServer(unpack(args))
+        end)
+    end
+end
+
+local function fireJobRemote(...)
+    JobRemote:FireServer(...)
+end
+
+local function hasCrateTool()
+    for _, tool in pairs(LocalPlayer.Backpack:GetChildren()) do
+        if tool.Name == "Crate" then 
+            return tool 
+        end
+    end
+    for _, tool in pairs(LocalPlayer.Character:GetChildren()) do
+        if tool:IsA("Tool") and tool.Name == "Crate" then 
+            return tool 
+        end
+    end
+    return nil
+end
+
+local function clearPath()
+    for _, v in ipairs(pathFolder:GetChildren()) do
+        v:Destroy()
+    end
+end
+
+local function showPath(waypoints)
+    clearPath()
+    for i, wp in ipairs(waypoints) do
+        local part = Instance.new("Part")
+        part.Anchored = true
+        part.CanCollide = false
+        part.Material = Enum.Material.Neon
+        part.Color = Color3.fromRGB(0, 255, 0)
+        part.Size = Vector3.new(0.8, 0.3, 0.8)
+        part.Shape = Enum.PartType.Ball
+        part.Position = wp.Position + Vector3.new(0, 0.6, 0)
+        part.Transparency = 0.3
+        part.Name = "Waypoint"..i
+        part.Parent = pathFolder
+    end
+end
+
+local function tweenStepFast(fromPos, toPos)
+    local char = LocalPlayer.Character
+    if not char then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root or not Config.AutoFarm.Crate.Enabled then return end
+    
+    local dist = (fromPos - toPos).Magnitude
+    local baseSpeed = 16
+    local maxSpeed = 30
+    local speed = math.clamp(baseSpeed + (dist / 7), baseSpeed, maxSpeed)
+    local duration = dist / speed
+    local safeY = math.max(fromPos.Y, toPos.Y) + 4
+    
+    local function safeTween(targetCFrame, tweenDuration)
+        if not Config.AutoFarm.Crate.Enabled then return end
+        local tween = TweenService:Create(root, 
+            TweenInfo.new(tweenDuration, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), 
+            {CFrame = targetCFrame}
+        )
+        tween:Play()
+        tween.Completed:Wait()
+    end
+
+    if math.abs(toPos.Y - fromPos.Y) > 6 then
+        local up1 = CFrame.new(fromPos.X, safeY, fromPos.Z)
+        local up2 = CFrame.new(toPos.X, safeY, toPos.Z)
+        local down = CFrame.new(toPos.X, toPos.Y + 2, toPos.Z)
+        
+        safeTween(up1, 0.3)
+        safeTween(up2, duration * 0.7)
+        safeTween(down, 0.3)
+    else
+        safeTween(CFrame.new(toPos.X, toPos.Y + 2, toPos.Z), duration)
+    end
+end
+
+local function tweenStepSlow(fromPos, toPos)
+    local char = LocalPlayer.Character
+    if not char then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root or not Config.AutoFarm.Crate.Enabled then return end
+    
+    local dist = (fromPos - toPos).Magnitude
+    local baseSpeed = 8
+    local maxSpeed = 15
+    local speed = math.clamp(baseSpeed + (dist / 12), baseSpeed, maxSpeed)
+    local duration = dist / speed
+    local safeY = math.max(fromPos.Y, toPos.Y) + 4
+    
+    local function safeTween(targetCFrame, tweenDuration)
+        if not Config.AutoFarm.Crate.Enabled then return end
+        local tween = TweenService:Create(root, 
+            TweenInfo.new(tweenDuration, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), 
+            {CFrame = targetCFrame}
+        )
+        tween:Play()
+        tween.Completed:Wait()
+    end
+
+    if math.abs(toPos.Y - fromPos.Y) > 6 then
+        local up1 = CFrame.new(fromPos.X, safeY, fromPos.Z)
+        local up2 = CFrame.new(toPos.X, safeY, toPos.Z)
+        local down = CFrame.new(toPos.X, toPos.Y + 2, toPos.Z)
+        
+        safeTween(up1, 0.5)
+        safeTween(up2, duration * 0.8)
+        safeTween(down, 0.5)
+    else
+        safeTween(CFrame.new(toPos.X, toPos.Y + 2, toPos.Z), duration)
+    end
+end
+
+local function walkTo(targetPart, useFastSpeed, clearAfter)
+    if clearAfter == nil then clearAfter = true end
+    if not Config.AutoFarm.Crate.Enabled then return end
+    
+    local char = LocalPlayer.Character
+    if not char then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+    
+    local success, path = pcall(function()
+        local p = PathfindingService:CreatePath({
+            AgentRadius = 2,
+            AgentHeight = 5,
+            AgentCanJump = true,
+            AgentMaxSlope = 45,
+            AgentCanClimb = false
+        })
+        p:ComputeAsync(root.Position, targetPart.Position)
+        return p
+    end)
+    
+    if success and path.Status == Enum.PathStatus.Success then
+        local waypoints = path:GetWaypoints()
+        showPath(waypoints)
+        local currentPos = root.Position
+        
+        for i, wp in ipairs(waypoints) do
+            if not Config.AutoFarm.Crate.Enabled then break end
+            if wp.Action == Enum.PathWaypointAction.Jump then
+                local humanoid = char:FindFirstChild("Humanoid")
+                if humanoid then
+                    humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                    task.wait(useFastSpeed and 0.2 or 0.3)
+                end
+            end
+            if useFastSpeed then
+                tweenStepFast(currentPos, wp.Position)
+            else
+                tweenStepSlow(currentPos, wp.Position)
+            end
+            currentPos = wp.Position
+            local marker = pathFolder:FindFirstChild("Waypoint"..i)
+            if marker then marker:Destroy() end
+        end
+        
+        if clearAfter then
+            clearPath()
+        end
+    else
+        if not Config.AutoFarm.Crate.Enabled then return end
+        if useFastSpeed then
+            tweenStepFast(root.Position, targetPart.Position)
+        else
+            tweenStepSlow(root.Position, targetPart.Position)
+        end
+    end
+end
+
+spawn(function()
+    while task.wait(1) do
+        if Config.AutoFarm.Crate.Enabled then
+            if not hasCrateTool() then
+                local currentTime = tick()
+                if not hasCompletedFirstDelivery or (currentTime - lastCrateAttempt > 10 and not hasCrateTool()) then
+                    fireJobRemote("Start", "Crate")
+                    task.wait(2)
+                end
+                lastCrateAttempt = currentTime
+                
+                local cratePrompt = workspace.Jobs.Crate.Crates:FindFirstChild("Prompt")
+                if cratePrompt then
+                    local useFastSpeed = hasCompletedFirstDelivery
+                    walkTo(cratePrompt, useFastSpeed, true)
+                    fireJobRemote("Event", "Crate", "TakeCrate")
+                    task.wait(1)
+                end
+            else
+                local tool = hasCrateTool()
+                if LocalPlayer.Backpack:FindFirstChild("Crate") then
+                    LocalPlayer.Character.Humanoid:EquipTool(tool)
+                    task.wait(1)
+                end
+                local truckPrompt = workspace.Jobs.Crate.Truck:FindFirstChild("Prompt")
+                if truckPrompt then
+                    walkTo(truckPrompt, true, false)
+                    fireJobRemote("Event", "Crate", "Truck")
+                    hasCompletedFirstDelivery = true
+                    task.wait(3)
+                    DepositMoney()
+                end
+            end
+        else
+            hasCompletedFirstDelivery = false
+        end
+    end
+end)
+
+spawn(function()
+    while task.wait(1) do
+        AutoRespawn()
+    end
+end)
+
+--[[Ink.Farm]]
+local function CallRemote(r, ...)
+    local a = {...}
+    local s, r = pcall(function()
+        if r.ClassName == "RemoteEvent" then
+            r:FireServer(unpack(a))
+        elseif r.ClassName == "RemoteFunction" then
+            return r:InvokeServer(unpack(a))
+        end
+    end)
+    return r
+end
+
+local function getInk(name)
+    for _, item in ipairs(LocalPlayer.Inventory:GetChildren()) do
+        if item.Value == name then
+            return item
+        end
+    end
+    return nil
+end
+
+task.spawn(function()
+    while task.wait(1) do
+        if Config.AutoFarm.Enabled then
+            for _, inkName in ipairs(Config.AutoFarm.Inks) do
+                local ink = getInk(inkName)
+                if not ink then
+                    for i = 1, Config.AutoFarm.BuyLimit do
+                        CallRemote(ShopRemote, "Illegal", inkName)
+                    end
+                else
+                    InventoryEvent:FireServer("Transfer", ink, LocalPlayer.Printer)
+                    PrinterEvent:FireServer("Use")
+                    for i = 1, 5 do
+                        PrinterEvent:FireServer("Print", true)
+                        DepositMoney()
+                    end
+                end
+            end
+        end
+    end
+end)
+
+ 
+
+--[[Ui intergation]]
+
+
+--[[Main Ui intergation]]
+
+ Tabs.Main:CreateToggle({ Name = "Aura Enabled", CurrentValue = Config.Main.Aura.Enabled, Callback = function(v) Config.Main.Aura.Enabled = v end })
+Tabs.Main:CreateDropDown({ Title = "Aura Mode", Options = { "Melee Aura", "Gun Aura" }, CurrentOption = Config.Main.Aura.Mode, Callback = function(v) Config.Main.Aura.Mode = v end })
+Tabs.Main:CreateSlider({ Name = "Aura Range", DefaultValue = Config.Main.Aura.Range, MinValue = 0, MaxValue = 1000, Increment = 1, Callback = function(v)
+    Config.Main.Aura.Range = v
+end })
+
+
+Tabs.Main:CreateDropDown({ Title = "Target Part", Options = { "Head", "HumanoidRootPart", "UpperTorso", "LowerTorso" }, CurrentOption = Config.Main.Aura.TargetPart, Callback = function(v) Config.Main.Aura.TargetPart = v end })
+
+ 
+Tabs.Main:CreateToggle({
+    Name = "Auto Safe",
+    CurrentValue = Config.Main.AutoSafe.Enabled,
+    Callback = function(state)
+        Config.Main.AutoSafe.Enabled = state
+    end,
+})
+
+Tabs.Main:CreateSlider({
+    Name = "Health",
+    DefaultValue = Config.Main.AutoSafe.HealthThreshold,
+    MinValue = 0,
+    MaxValue = 100,
+    Increment = 1,
+    Callback = function(v)
+        Config.Main.AutoSafe.HealthThreshold = v
+    end
+})
+
+Tabs.Main:CreateDropDown({
+    Text = "Tool Mode",
+    Options = {"All Tools", "Only Guns"},
+    CurrentOption = Config.Main.AutoSafe.ToolMode,
+    Multi = false,
+    Placeholder = "Select Mode",
+    Callback = function(selected)
+        Config.Main.AutoSafe.ToolMode = selected
+    end
+})
+
+
+Tabs.Main:CreateDropDown({
+    Text = "Method",
+    Options = {"Nearest Car", "Nearest Unused Car"},
+    CurrentOption = Config.Main.Method,
+    Multi = false,
+    Callback = function(v)
+        Config.Main.Method = v
+    end
+})
+
+Tabs.Main:CreateToggle({
+    Name = "Screen Button",
+    CurrentValue = Config.Main.ShowScreenButton,
+    Callback = function(v)
+        Config.Main.ShowScreenButton = v
+        if v then
+            createScreenButton()
+        else
+            deleteScreenButton()
+        end
+    end
+})
+
+Tabs.Main:CreateButton({
+    Name = "Steal Car",
+    Callback = function()
+        seatPlayerInCar()
+    end
+})
+  
+   Tabs.Main:CreateDropDown({
+    Text = "Teleport Position",
+    Options = {"GunShop","CarShop", "clothing", "apt1"},
+    CurrentOption = Config.Main.Teleport.SelectedTP,
+    Multi = false,
+    Callback = function(v) Config.Main.Teleport.SelectedTP = v end
+})
+
+Tabs.Main:CreateDropDown({
+    Text = "Car",
+    Options = {"My Car"},
+    CurrentOption = Config.Main.CarMod.Target,
+    Multi = false,
+    Callback = function(v) Config.Main.CarMod.Target = v end
+})
+
+Tabs.Main:CreateInputField({
+    Name = "Player",
+    PlaceholderText = "UserName",
+    Callback = function(P) Config.Main.PlayerTeleport.PlayerUserTarget = P end
+})
+
+Tabs.Main:CreateButton({ Name = "Teleport Car", Callback = TpCarWCar })
+Tabs.Main:CreateButton({ Name = "Teleport to Player", Callback = TptoPlayerWCar })
+Tabs.Main:CreateButton({ Name = "Bring Car to Me", Callback = BringCarToMe })
+
+  
+  Tabs.Main:CreateDropDown({
+    Text = "Car Target",
+    Options = {"My Car", "Nearest Car", "Every Car"},
+    CurrentOption = Config.Main.CarMod.Target,
+    Multi = false,
+    Callback = function(v)
+        Config.Main.CarMod.Target = v
+    end
+})
+
+Tabs.Main:CreateSlider({
+    Name = "Acceleration",
+    DefaultValue = Config.Main.CarMod.Acceleration,
+    MinValue = 0,
+    MaxValue = 1000,
+    Increment = 100,
+    Callback = function(v)
+        Config.Main.CarMod.Acceleration = v
+    end
+})
+
+Tabs.Main:CreateSlider({
+    Name = "Braking",
+    DefaultValue = Config.Main.CarMod.Braking,
+    MinValue = 0,
+    MaxValue = 1000,
+    Increment = 100,
+    Callback = function(v)
+        Config.Main.CarMod.Braking = v
+    end
+})
+
+Tabs.Main:CreateSlider({
+    Name = "Deceleration",
+    DefaultValue = Config.Main.CarMod.Deceleration,
+    MinValue = 0,
+    MaxValue = 1000,
+    Increment = 100,
+    Callback = function(v)
+        Config.Main.CarMod.Deceleration = v
+    end
+})
+
+Tabs.Main:CreateSlider({
+    Name = "Forward Max Speed",
+    DefaultValue = Config.Main.CarMod.ForwardMaxSpeed,
+    MinValue = 0,
+    MaxValue = 1000,
+    Increment = 100,
+    Callback = function(v)
+        Config.Main.CarMod.ForwardMaxSpeed = v
+    end
+})
+
+Tabs.Main:CreateSlider({
+    Name = "Reverse Max Speed",
+    DefaultValue = Config.Main.CarMod.ReverseMaxSpeed,
+    MinValue = 0,
+    MaxValue = 1000,
+    Increment = 100,
+    Callback = function(v)
+        Config.Main.CarMod.ReverseMaxSpeed = v
+    end
+})
+
+Tabs.Main:CreateButton({
+    Name = "Confirm Car Mod",
+    Callback = applyEngineMods
+})
+
+ 
+  
+  
+  
+  --[[Aimbot ui ]]
+  
+  Tabs.Aimbot:CreateToggle({
+    Name = "Enabled",
+    CurrentValue = Config.Aimbot.Enabled,
+    Callback = function(state)
+        Config.Aimbot.Enabled = state
+    end,
+})
+
+Tabs.Aimbot:CreateDropDown({
+    Text = "Mode",
+    Options = {"Aimbot", "Slient Aim"},
+    CurrentOption = Config.Aimbot.AimMode,
+    Multi = false,
+    Placeholder = "Select Method",
+    Callback = function(selected)
+        Config.Aimbot.AimMode = selected
+    end
+})
+
+Tabs.Aimbot:CreateToggle({
+    Name = "Wallbang (slient aim only)",
+    CurrentValue = Config.Aimbot.Wallbang,
+    Callback = function(state)
+        Config.Aimbot.Wallbang = state
+    end,
+})
+
+Tabs.Aimbot:CreateToggle({
+    Name = "FOV Enabled",
+    CurrentValue = Config.FovAimbot.Enabled,
+    Callback = function(state)
+        Config.FovAimbot.Enabled = state
+        FOVring.Visible = state
+    end,
+})
+
+
+Tabs.Aimbot:CreateSlider({
+    Name = "FOV Size",
+    DefaultValue = Config.FovAimbot.Size,
+    MinValue = 10,
+    MaxValue = 360,
+    Increment = 1,
+    Callback = function(v)
+        Config.FovAimbot.Size = v
+        FOVring.Radius = v
+    end
+})
+
+
+Tabs.Aimbot:CreateColorpicker({
+    Name = "FOV Circle Color",
+    DefaultValue = Config.FovAimbot.Color,
+    Callback = function(color)
+        Config.FovAimbot.Color = color
+        FOVring.Color = color
+    end
+})
+
+Tabs.Aimbot:CreateDropDown({
+    Text = "Select Target Method",
+    Options = {"Fov", "Closest"},
+    CurrentOption = Config.Aimbot.Method,
+    Multi = false,
+    Placeholder = "Select Method",
+    Callback = function(selected)
+        Config.Aimbot.Method = selected
+    end
+})
+
+
+Tabs.Aimbot:CreateSlider({
+    Name = "Prediction",
+    DefaultValue = Config.Aimbot.Prediction,
+    MinValue = 0,
+    MaxValue = 1,
+    Increment = 0.01,
+    Callback = function(v)
+        Config.Aimbot.Prediction = v
+    end
+})
+
+
+Tabs.Aimbot:CreateSlider({
+    Name = "Max Distance",
+    DefaultValue = Config.Aimbot.MaxDistance,
+    MinValue = 10,
+    MaxValue = 1000,
+    Increment = 1,
+    Callback = function(v)
+        Config.Aimbot.MaxDistance = v
+    end
+})
+
+
+Tabs.Aimbot:CreateToggle({
+    Name = "Friend Check",
+    CurrentValue = Config.Misc.Friend,
+    Callback = function(state)
+        Config.Misc.Friend = state
+    end,
+})
+
+
+Tabs.Aimbot:CreateToggle({
+    Name = "Wall Check",
+    CurrentValue = Config.Aimbot.WallCheck,
+    Callback = function(state)
+        Config.Aimbot.WallCheck = state
+    end,
+})
+
+  
+  
+  --[[Esp ui]]
+  
+   Tabs.Esp:CreateToggle({
+    Name = "Enable ESP",
+    CurrentValue = Config.Esp.Players.Enabled,
+    Callback = function(v) Config.Esp.Players.Enabled = v end
+})
+
+Tabs.Esp:CreateToggle({
+    Name = "Show Names",
+    CurrentValue = Config.Esp.Players.Names.Enabled,
+    Callback = function(v) Config.Esp.Players.Names.Enabled = v end
+})
+Tabs.Esp:CreateColorpicker({
+    Name = "Name Color",
+    DefaultValue = Config.Esp.Players.Names.Color,
+    Callback = function(c) Config.Esp.Players.Names.Color = c end
+})
+
+Tabs.Esp:CreateToggle({
+    Name = "Box Chams",
+    CurrentValue = Config.Esp.Players['Box Chams'].Enabled,
+    Callback = function(v) Config.Esp.Players['Box Chams'].Enabled = v end
+})
+Tabs.Esp:CreateColorpicker({
+    Name = "Box Chams Color",
+    DefaultValue = Config.Esp.Players['Box Chams'].Color,
+    Callback = function(c) Config.Esp.Players['Box Chams'].Color = c end
+})
+Tabs.Esp:CreateColorpicker({
+    Name = "Box Chams Color2",
+    DefaultValue = Config.Esp.Players['Box Chams'].Color2,
+    Callback = function(c) Config.Esp.Players['Box Chams'].Color2 = c end
+})
+
+Tabs.Esp:CreateToggle({
+    Name = "Visualize Chams",
+    CurrentValue = Config.Esp.Players['Visualize Chams'].Enabled,
+    Callback = function(v) Config.Esp.Players['Visualize Chams'].Enabled = v end
+})
+Tabs.Esp:CreateColorpicker({
+    Name = "Visualize Chams Color",
+    DefaultValue = Config.Esp.Players['Visualize Chams'].Color,
+    Callback = function(c) Config.Esp.Players['Visualize Chams'].Color = c end
+})
+Tabs.Esp:CreateColorpicker({
+    Name = "Visualize Chams Color2",
+    DefaultValue = Config.Esp.Players['Visualize Chams'].Color2,
+    Callback = function(c) Config.Esp.Players['Visualize Chams'].Color2 = c end
+})
+
+Tabs.Esp:CreateToggle({
+    Name = "Weapon ESP",
+    CurrentValue = Config.Esp.Players.Weapon.Enabled,
+    Callback = function(v) Config.Esp.Players.Weapon.Enabled = v end
+})
+Tabs.Esp:CreateColorpicker({
+    Name = "Weapon Color",
+    DefaultValue = Config.Esp.Players.Weapon.Color,
+    Callback = function(c) Config.Esp.Players.Weapon.Color = c end
+})
+
+Tabs.Esp:CreateToggle({
+    Name = "Box ESP",
+    CurrentValue = Config.Esp.Players.Box.Enabled,
+    Callback = function(v) Config.Esp.Players.Box.Enabled = v end
+})
+Tabs.Esp:CreateColorpicker({
+    Name = "Box Color",
+    DefaultValue = Config.Esp.Players.Box.Color,
+    Callback = function(c) Config.Esp.Players.Box.Color = c end
+})
+
+Tabs.Esp:CreateToggle({
+    Name = "Distance ESP",
+    CurrentValue = Config.Esp.Players.Distance.Enabled,
+    Callback = function(v) Config.Esp.Players.Distance.Enabled = v end
+})
+Tabs.Esp:CreateColorpicker({
+    Name = "Distance Color",
+    DefaultValue = Config.Esp.Players.Distance.Color,
+    Callback = function(c) Config.Esp.Players.Distance.Color = c end
+})
+
+Tabs.Esp:CreateToggle({
+    Name = "Health Text",
+    CurrentValue = Config.Esp.Players.HealthText,
+    Callback = function(v) Config.Esp.Players.HealthText = v end
+})
+Tabs.Esp:CreateToggle({
+    Name = "Health Bar",
+    CurrentValue = Config.Esp.Players.HealthBar,
+    Callback = function(v) Config.Esp.Players.HealthBar = v end
+})
+
+ 
+
+Tabs.Esp:CreateToggle({
+    Name = "Inventory Text",
+    CurrentValue = Config.Esp.Players.ShowInventoryText.Enabled,
+    Callback = function(v) Config.Esp.Players.ShowInventoryText.Enabled = v end
+})
+Tabs.Esp:CreateColorpicker({
+    Name = "Inventory Text Color",
+    DefaultValue = Config.Esp.Players.ShowInventoryText.Color,
+    Callback = function(c) Config.Esp.Players.ShowInventoryText.Color = c end
+})
+
+Tabs.Esp:CreateDropDown({
+    Name = "Box Type",
+    Options = {"Full", "Corners"},
+    CurrentOption = Config.Esp.Players['Box Type'],
+    Multi = false, 
+    Callback = function(v) Config.Esp.Players['Box Type'] = v end
+})
+
+Tabs.Esp:CreateSlider({
+    Name = "Distance Render Limit",
+    DefaultValue = Config.Esp.Players['Distance Render Limit'],
+    MinValue = 100,
+    MaxValue = 50000,
+    Increment = 100,
+    Callback = function(v) Config.Esp.Players['Distance Render Limit'] = v end
+})
+
+--[[AutoFarm ui]]
+
+Tabs.AutoFarm:CreateSection("AutoFarms Settings")
+
+Tabs.AutoFarm:CreateToggle({
+    Name = "Auto Deposit",
+    CurrentValue = Config.AutoDeposit.Enabled,
+    Callback = function(v)
+        Config.AutoDeposit.Enabled = v
+    end
+})  
+
+Tabs.AutoFarm:CreateSeperator()
+
+Tabs.AutoFarm:CreateSection("AutoFarms")
+
+Tabs.AutoFarm:CreateToggle({
+    Name = "Crate",
+    CurrentValue = Config.AutoFarm.Crate.Enabled,
+    Callback = function(v)
+        Config.AutoFarm.Crate.Enabled = v
+    end
+})
+
+
+
+Tabs.AutoFarm:CreateLabel({
+Title = "ink Farm help",
+Content = "1. Buy House | apartment 2. get rich ",
+})
+
+Tabs.AutoFarm:CreateToggle({
+    Name = "Ink Farm",
+    CurrentValue = Config.AutoFarm.Enabled,
+    Callback = function(v) Config.AutoFarm.Enabled = v end
+})
+
+Tabs.AutoFarm:CreateDropDown({
+    Text = "Select Inks",
+    Options = {"Small Ink", "Medium Ink", "Large Ink", "Special Ink"},
+    CurrentOption = Config.AutoFarm.Inks,
+    Multi = true,
+    Callback = function(v) Config.AutoFarm.Inks = v end
+})
+
+Tabs.AutoFarm:CreateSlider({
+    Name = "Buy Amount",
+    DefaultValue = Config.AutoFarm.BuyLimit,
+    MinValue = 1,
+    MaxValue = 15,
+    Increment = 1,
+    Callback = function(v) Config.AutoFarm.BuyLimit = v end
+})
+
+
+
+--[[Misc Ui]]
+
+Tabs.Misc:CreateToggle({ Name = "Friend Check", CurrentValue = Config.Misc.Friend, Callback = function(v) Config.Misc.Friend = v end })
+
+
+Tabs.Misc:CreateToggle({
+    Name = "Anti AFK",
+    CurrentValue = Config.Misc.AntiAfk,
+    Callback = function(state)
+        Config.Misc.AntiAfk = state
+        if state then
+            if antiAfkConnection then antiAfkConnection:Disconnect() end
+            antiAfkConnection = LocalPlayer.Idled:Connect(function()
+                VirtualUser:CaptureController()
+                VirtualUser:ClickButton2(Vector2.new())
+            end)
+        else
+            if antiAfkConnection then
+                antiAfkConnection:Disconnect()
+                antiAfkConnection = nil
+            end
+        end
+    end
+})
+
+
+
+Tabs.Misc:CreateToggle({
+    Name = "Fps Shower",
+    CurrentValue = Config.Misc.Fps,
+    Callback = function(state)
+        Config.Misc.Fps = state
+        local guiName = "Ã‚Â§FPSÃ‚Â§UIÃ‚Â§"
+        local existing = CoreGui:FindFirstChild(guiName)
+        if state then
+            if not existing then
+                FpsLabel_FpsPing = CreateStatUI_FpsPing("FPS", UDim2.new(0.5, -390, 0, 62), UDim2.new(0, 100, 0, 40), guiName)
+            end
+        else
+            if existing then
+                LastFPSPos_FpsPing = existing:FindFirstChildOfClass("Frame").Position
+                existing:Destroy()
+                FpsLabel_FpsPing = nil
+            end
+        end
+    end,
+})
+
+Tabs.Misc:CreateToggle({
+    Name = "Ping Shower",
+    CurrentValue = Config.Misc.Ping,
+    Callback = function(state)
+        Config.Misc.Ping = state
+        local guiName = "Ã‚Â§PINGÃ‚Â§UIÃ‚Â§"
+        local existing = CoreGui:FindFirstChild(guiName)
+        if state then
+            if not existing then
+                PingLabel_FpsPing = CreateStatUI_FpsPing("PING", UDim2.new(0.5, -391, 0, 108), UDim2.new(0, 100, 0, 40), guiName)
+            end
+        else
+            if existing then
+                LastPingPos_FpsPing = existing:FindFirstChildOfClass("Frame").Position
+                existing:Destroy()
+                PingLabel_FpsPing = nil
+            end
+        end
+    end,
+})
+
+
+ 
+
+ 
+
+local bankEvent = ReplicatedStorage.Modules.Packages._Index:FindFirstChild("sleitnick_net@0.2.0").net:FindFirstChild("RF/BankEvent")
+local lastBalance = ""
+
+local function formatMoney(amount)
+    return tostring(amount):reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")
+end
+
+local function getBankBalance()
+    local success, result = pcall(function()
+        local atmGui = LocalPlayer.PlayerGui:FindFirstChild("ATM")
+        if atmGui and atmGui.Main and atmGui.Main.Bank then
+            local text = atmGui.Main.Bank.Text
+            local balance = text:match("Balance%s*:%s*%$([%d,]+)") or text:match("%$([%d,]+)")
+            return balance and balance:gsub(",", "") or "0"
+        end
+        return "0"
+    end)
+    return success and result or "0"
+end
+
+local function getBankText()
+    local success, result = pcall(function()
+        local atmGui = LocalPlayer.PlayerGui:FindFirstChild("ATM")
+        if atmGui and atmGui.Main and atmGui.Main.Bank then
+            return atmGui.Main.Bank.Text or ""
+        end
+        return ""
+    end)
+    return success and result or ""
+end
+
+local balanceLabel = Tabs.Misc:CreateLabel({
+    Title = "💰 Bank Balance",
+    Content = "Balance: $" .. formatMoney(getBankBalance())
+})
+
+local bankTxt = getBankText()
+lastBalance = getBankBalance()
+
+RunService.Heartbeat:Connect(function()
+    local currentText = getBankText()
+    if currentText ~= bankTxt and currentText ~= "" then
+        bankTxt = currentText
+        local newBalance = getBankBalance()
+        if newBalance ~= lastBalance then
+            pcall(function()
+                balanceLabel:Set("💰 Bank Balance", "Balance: $" .. formatMoney(newBalance))
+            end)
+            lastBalance = newBalance
+        end
+    end
+end)
+
+Tabs.Misc:CreateInputField({
+    Name = "Withdraw Amount",
+    PlaceholderText = "Enter amount...",
+    Callback = function(input)
+        local success, amount = pcall(function()
+            local cleanInput = tostring(input or ""):gsub("[,%$%s]", "")
+            return tonumber(cleanInput) or 0
+        end)
+        Config.Misc.Withdraw = success and math.max(0, math.floor(amount)) or 0
+        if not success or Config.Misc.Withdraw <= 0 then
+            pcall(function()
+                window:CreateNotification({
+                    Title = "Invalid Amount",
+                    Description = "Please enter a valid number",
+                    Icon = "alert-triangle",
+                    Time = 2
+                })
+            end)
+        end
+    end
+})
+
+Tabs.Misc:CreateInputField({
+    Name = "Deposit Amount", 
+    PlaceholderText = "Enter amount...",
+    Callback = function(input)
+        local success, amount = pcall(function()
+            local cleanInput = tostring(input or ""):gsub("[,%$%s]", "")
+            return tonumber(cleanInput) or 0
+        end)
+        Config.Misc.Deposit = success and math.max(0, math.floor(amount)) or 0
+        if not success or Config.Misc.Deposit <= 0 then
+            pcall(function()
+                window:CreateNotification({
+                    Title = "Invalid Amount",
+                    Description = "Please enter a valid number",
+                    Icon = "alert-triangle",
+                    Time = 2
+                })
+            end)
+        end
+    end
+})
+
+Tabs.Misc:CreateButton({
+    Name = "Confirm Deposit",
+    Callback = function()
+        if Config.Misc.Deposit <= 0 then
+            pcall(function()
+                window:CreateNotification({
+                    Title = "No Amount Set",
+                    Description = "Enter deposit amount first",
+                    Icon = "info",
+                    Time = 2
+                })
+            end)
+            return
+        end
+        
+        task.spawn(function()
+            if bankEvent then
+                local success = pcall(bankEvent.InvokeServer, bankEvent, "Deposit", Config.Misc.Deposit)
+                if not success then
+                    pcall(function()
+                        window:CreateNotification({
+                            Title = "Transaction Failed",
+                            Description = "Deposit failed to process",
+                            Icon = "x-circle",
+                            Time = 2
+                        })
+                    end)
+                end
+            else
+                pcall(function()
+                    window:CreateNotification({
+                        Title = "Service Error",
+                        Description = "Bank service unavailable",
+                        Icon = "x-circle",
+                        Time = 2
+                    })
+                end)
+            end
+        end)
+    end
+})
+
+Tabs.Misc:CreateButton({
+    Name = "Confirm Withdraw",
+    Callback = function()
+        if Config.Misc.Withdraw <= 0 then
+            pcall(function()
+                window:CreateNotification({
+                    Title = "No Amount Set",
+                    Description = "Enter withdraw amount first",
+                    Icon = "info",
+                    Time = 2
+                })
+            end)
+            return
+        end
+        
+        task.spawn(function()
+            if bankEvent then
+                local success = pcall(bankEvent.InvokeServer, bankEvent, "Withdraw", Config.Misc.Withdraw)
+                if not success then
+                    pcall(function()
+                        window:CreateNotification({
+                            Title = "Transaction Failed",
+                            Description = "Withdraw failed to process",
+                            Icon = "x-circle",
+                            Time = 2
+                        })
+                    end)
+                end
+            else
+                pcall(function()
+                    window:CreateNotification({
+                        Title = "Service Error",
+                        Description = "Bank service unavailable",
+                        Icon = "x-circle",
+                        Time = 2
+                    })
+                end)
+            end
+        end)
+    end
+})
+
+
+task.wait(3)
+
+
+
+local RENotify = ReplicatedStorage.Modules.Packages._Index["sleitnick_net@0.2.0"].net["RE/Notify"]
+
+
+firesignal(RENotify.OnClientEvent, 
+    "bottom",
+    "✨🥀You have been Hacked✌🔥."
+)
